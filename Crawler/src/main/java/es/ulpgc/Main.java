@@ -16,7 +16,14 @@ public class Main {
     public static void main(String[] args) {
         // Initialize Hazelcast
         Config config = new Config();
+        config.getNetworkConfig().getJoin()
+                .getMulticastConfig().setEnabled(false); // Disable multicast
+        config.getNetworkConfig().getJoin()
+                .getTcpIpConfig().setEnabled(true)
+                .addMember("192.168.106.45") // Add member IPs
+                .addMember("192.168.56.1");
         HazelcastInstance hazelcast = Hazelcast.newHazelcastInstance(config);
+
 
         IQueue<Integer> taskQueue = hazelcast.getQueue("bookIdQueue");
         IMap<Integer, Boolean> progressMap = hazelcast.getMap("progressMap");
@@ -41,7 +48,8 @@ public class Main {
         GutenbergCrawler crawler = new GutenbergCrawler();
         System.out.println("Starting crawling process...");
 
-        // Use ScheduledExecutorService to stop the application after 5 seconds
+        // THIS PART IS FOR TEST ONLY DELETE ON FINAL VERSION
+        /*
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.schedule(() -> {
             System.out.println("Time's up! Stopping the crawling process...");
@@ -50,7 +58,7 @@ public class Main {
             System.out.println("Progress map saved.");
             System.exit(0); // Exit cleanly after 5 seconds
         }, 10, TimeUnit.SECONDS);
-
+        */
         // Start the crawling process
         while (true) {
             try {
