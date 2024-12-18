@@ -1,12 +1,15 @@
 package es.ulpgc;
 
-import java.io.File;
-import java.io.IOException;
+import com.hazelcast.map.IMap;
+
+import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FileManager {
     private static final String DOWNLOAD_FOLDER = "datalake";
@@ -92,5 +95,34 @@ public class FileManager {
             }
         }
         return largestFile;
+    }
+
+    public static void saveProgressMap(IMap<Integer, Boolean> progressMap, String filePath) {
+        // Convert Hazelcast IMap to a serializable HashMap
+        Map<Integer, Boolean> localMap = new HashMap<>(progressMap);
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            oos.writeObject(localMap);
+            System.out.println("Progress map saved successfully.");
+        } catch (IOException e) {
+            System.err.println("Failed to save progress map: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void loadProgressMap(IMap<Integer, Boolean> progressMap, String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.out.println("Progress map file not found. Starting with an empty map.");
+            return;
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            Map<Integer, Boolean> localMap = (Map<Integer, Boolean>) ois.readObject();
+            progressMap.putAll(localMap); // Load data into Hazelcast IMap
+            System.out.println("Progress map loaded successfully.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Failed to load progress map: " + e.getMessage());
+        }
     }
 }
