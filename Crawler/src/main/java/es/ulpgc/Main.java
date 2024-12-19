@@ -1,14 +1,10 @@
 package es.ulpgc;
 
 import com.hazelcast.collection.IQueue;
-import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Main {
     private static final String PROGRESS_MAP_FILE = "progressMap.dat";
@@ -40,18 +36,6 @@ public class Main {
         GutenbergCrawler crawler = new GutenbergCrawler();
         System.out.println("Starting crawling process...");
 
-        // THIS PART IS FOR TEST ONLY DELETE ON FINAL VERSION
-        /*
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.schedule(() -> {
-            System.out.println("Time's up! Stopping the crawling process...");
-            // Save progress map before exiting
-            FileManager.saveProgressMap(progressMap, PROGRESS_MAP_FILE);
-            System.out.println("Progress map saved.");
-            System.exit(0); // Exit cleanly after 5 seconds
-        }, 10, TimeUnit.SECONDS);
-        */
-        // Start the crawling process
         while (true) {
             try {
                 Integer bookId = taskQueue.poll();
@@ -68,6 +52,7 @@ public class Main {
                 System.out.println("Crawling book ID #" + bookId);
                 crawler.crawlBooks(bookId, 1); // Process one book
                 progressMap.put(bookId, true);
+                FileManager.saveProgressMap(progressMap, PROGRESS_MAP_FILE);
                 System.out.println("Book ID #" + bookId + " crawled successfully.");
 
             } catch (Exception e) {
