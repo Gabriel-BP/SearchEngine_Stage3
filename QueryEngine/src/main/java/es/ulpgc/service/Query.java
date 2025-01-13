@@ -1,4 +1,4 @@
-package es.ulpgc;
+package es.ulpgc.service;
 
 public class Query {
     private final String query;

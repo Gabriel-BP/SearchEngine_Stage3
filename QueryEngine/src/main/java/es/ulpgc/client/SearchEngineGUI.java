@@ -1,4 +1,4 @@
-package es.ulpgc;
+package es.ulpgc.client;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,18 +8,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import es.ulpgc.service.*;
 
 public class SearchEngineGUI extends JFrame {
-    private JComboBox<String> dataSourceSelector;
-    private JButton loadButton;
-    private JTextField queryField;
-    private JTextField titleFilterField;
-    private JTextField authorFilterField;
-    private JTextField dateFilterField;
-    private JTextField languageFilterField;
-    private JTextField creditsFilterField;
-    private JButton searchButton;
-    private JTextArea resultsArea;
+    private final JComboBox<String> dataSourceSelector;
+    private final JButton loadButton;
+    private final JTextField queryField;
+    private final JTextField titleFilterField;
+    private final JTextField authorFilterField;
+    private final JTextField dateFilterField;
+    private final JTextField languageFilterField;
+    private final JTextField creditsFilterField;
+    private final JButton searchButton;
+    private final JTextArea resultsArea;
     private InvertedIndex invertedIndex;
 
     public SearchEngineGUI() {
@@ -105,6 +106,7 @@ public class SearchEngineGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String selectedSource = (String) dataSourceSelector.getSelectedItem();
                 try {
+                    assert selectedSource != null;
                     if (selectedSource.equals("CSV")) {
                         String filePath = "index_content.csv";
                         String metadataPath = "index_metadata.csv";
@@ -153,7 +155,6 @@ public class SearchEngineGUI extends JFrame {
                         }
                     }
 
-                    // Create a map of filters
                     Map<String, String> filters = new HashMap<>();
                     if (!titleFilterField.getText().trim().isEmpty()) {
                         filters.put("Title", titleFilterField.getText().trim().toLowerCase());

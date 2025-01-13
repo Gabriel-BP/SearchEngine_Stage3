@@ -1,4 +1,4 @@
-package es.ulpgc;
+package es.ulpgc.service;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

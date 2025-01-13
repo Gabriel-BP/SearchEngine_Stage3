@@ -1,4 +1,4 @@
-package es.ulpgc;
+package es.ulpgc.service;
 
 import java.util.ArrayList;
 import java.util.List;

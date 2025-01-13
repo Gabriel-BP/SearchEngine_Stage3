@@ -1,5 +1,7 @@
 package es.ulpgc;
 
+import es.ulpgc.client.SearchEngineGUI;
+
 import javax.swing.SwingUtilities;
 
 public class Main {
