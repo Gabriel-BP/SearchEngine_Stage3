@@ -9,13 +9,11 @@ import java.util.concurrent.Executors;
 public class Indexer {
     private final BookIndexer bookIndexer;
     private final CSVWriter csvWriter;
-    private final DataMartWriter dataMartWriter;
 
     // Constructor
     public Indexer() {
         this.bookIndexer = new BookIndexer();
         this.csvWriter = new CSVWriter();
-        this.dataMartWriter = new DataMartWriter();
     }
 
     // Method that will use ExecutorService to parallelize indexing
@@ -43,10 +41,6 @@ public class Indexer {
                 case "csv":
                     csvWriter.saveMetadataToCSV(books);
                     csvWriter.saveContentToCSV(bookIndexer.getHashMapIndexer().getIndex());
-                    break;
-                case "datamart":
-                    dataMartWriter.saveMetadataToDataMart(books);
-                    dataMartWriter.saveContentToDataMart(bookIndexer.getHashMapIndexer().getIndex());
                     break;
                 default:
                     System.err.println("Unsupported output type: " + outputType);

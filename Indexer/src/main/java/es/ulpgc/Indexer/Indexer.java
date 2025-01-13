@@ -8,13 +8,11 @@ import java.util.concurrent.Executors;
 
 public class Indexer {
     private final BookIndexer bookIndexer;
-    private final CSVWriter csvWriter;
     private final DataMartWriter dataMartWriter;
 
     // Constructor
     public Indexer() {
         this.bookIndexer = new BookIndexer();
-        this.csvWriter = new CSVWriter();
         this.dataMartWriter = new DataMartWriter();
     }
 
@@ -40,10 +38,6 @@ public class Indexer {
 
             // Write the results in the desired format (CSV or DataMart)
             switch (outputType.toLowerCase()) {
-                case "csv":
-                    csvWriter.saveMetadataToCSV(books);
-                    csvWriter.saveContentToCSV(bookIndexer.getHashMapIndexer().getIndex());
-                    break;
                 case "datamart":
                     dataMartWriter.saveMetadataToDataMart(books);
                     dataMartWriter.saveContentToDataMart(bookIndexer.getHashMapIndexer().getIndex());
