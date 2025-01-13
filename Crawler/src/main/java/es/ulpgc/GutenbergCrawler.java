@@ -5,9 +5,11 @@ public class GutenbergCrawler {
     private static final String webID = "01";
 
     public void crawlBooks(int startBookId, int numBooks) {
-        String date = FileManager.getDate();
+        String date = FileManager.getCurrentDate();
         String folderPath = DOWNLOAD_FOLDER + "/" + date;
-        FileManager.createFolder(folderPath);
+        if (FileManager.getFoldersInPath().stream().noneMatch(folder -> folder.equals(date))) {
+            FileManager.createFolder(folderPath);
+        }
 
         for (int i = startBookId; i < startBookId + numBooks; i++) {
             boolean success = GutenbergDownloader.downloadBook(String.valueOf(i), folderPath, webID);
