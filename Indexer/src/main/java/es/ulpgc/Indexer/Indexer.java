@@ -3,8 +3,8 @@ package es.ulpgc.Indexer;
 import es.ulpgc.Cleaner.Book;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
+import java.util.concurrent.*;
 
 public class Indexer {
     private final BookIndexer bookIndexer;
@@ -16,27 +16,39 @@ public class Indexer {
         this.dataMartWriter = new DataMartWriter();
     }
 
-    // Method that will use ExecutorService to parallelize indexing
+    // Método para indexar los libros en paralelo utilizando ExecutorService
     public void buildIndexes(List<Book> books) {
-        ExecutorService executor = Executors.newFixedThreadPool(4);  // Adjust the number of threads based on the system
+        // Crear un ExecutorService con un número fijo de hilos
+        ExecutorService executor = Executors.newFixedThreadPool(4);  // Ajusta el número de hilos según tu sistema
 
-        // Submit indexing tasks to the thread pool
+        // Lista de tareas a ejecutar en paralelo
+        List<Callable<Void>> tasks = new ArrayList<>();
+
+        // Agregar las tareas de indexación para cada libro
         for (Book book : books) {
-            executor.submit(() -> {
-                bookIndexer.indexBook(book);
+            tasks.add(() -> {
+                bookIndexer.indexBook(book);  // Indexar el libro en paralelo
+                return null;
             });
         }
 
-        // Shut down the ExecutorService after completing the tasks
-        executor.shutdown();
+        try {
+            // Ejecutar todas las tareas en paralelo usando invokeAll
+            executor.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            System.err.println("Error during parallel execution: " + e.getMessage());
+        } finally {
+            // Apagar el ExecutorService después de completar las tareas
+            executor.shutdown();
+        }
     }
 
-    // Method to index the books and write the results
+    // Método para indexar los libros y escribir los resultados
     public void indexBooks(List<Book> books, String outputType) {
         try {
-            buildIndexes(books);  // Index the books in parallel
+            buildIndexes(books);  // Indexar los libros en paralelo
 
-            // Write the results in the desired format (CSV or DataMart)
+            // Escribir los resultados en el formato deseado (CSV o DataMart)
             switch (outputType.toLowerCase()) {
                 case "datamart":
                     dataMartWriter.saveMetadataToDataMart(books);
@@ -46,6 +58,7 @@ public class Indexer {
                     System.err.println("Unsupported output type: " + outputType);
             }
         } catch (Exception e) {
+            dataMartWriter.saveContentToDataMart(bookIndexer.getHashMapIndexer().getIndex());
             System.err.println("Error during indexing: " + e.getMessage());
         }
     }
