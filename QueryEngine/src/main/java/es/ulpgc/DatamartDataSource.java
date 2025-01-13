@@ -1,9 +1,12 @@
 package es.ulpgc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,17 +51,14 @@ public class DatamartDataSource implements DataSource {
     private Set<String> readWordFile(File file) {
         Set<String> references = new HashSet<>();
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS, true);
-
-            Map<String, Object> data = objectMapper.readValue(file, Map.class);
+            String content = new String(Files.readAllBytes(Paths.get(file.getPath())));
+            JSONObject jsonObject = new JSONObject(content);
 
             // Extraer las referencias desde el JSON
-            if (data.containsKey("references")) {
-                @SuppressWarnings("unchecked")
-                var refs = (Iterable<Object>) data.get("references");
-                for (Object ref : refs) {
-                    references.add(ref.toString());
+            if (jsonObject.has("references")) {
+                JSONArray refs = jsonObject.getJSONArray("references");
+                for (int i = 0; i < refs.length(); i++) {
+                    references.add(refs.getString(i));
                 }
             }
         } catch (IOException e) {
@@ -69,14 +69,18 @@ public class DatamartDataSource implements DataSource {
 
     public Map<String, Map<String, String>> loadMetadata(Set<String> ebookNumbers) {
         Map<String, Map<String, String>> metadata = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
 
         for (String ebookNumber : ebookNumbers) {
             File metadataFile = new File(metadataRootPath, ebookNumber + "/metadata.json");
             if (metadataFile.exists()) {
                 try {
-                    @SuppressWarnings("unchecked")
-                    Map<String, String> ebookMetadata = objectMapper.readValue(metadataFile, Map.class);
+                    String content = new String(Files.readAllBytes(Paths.get(metadataFile.getPath())));
+                    JSONObject jsonObject = new JSONObject(content);
+
+                    Map<String, String> ebookMetadata = new HashMap<>();
+                    for (String key : jsonObject.keySet()) {
+                        ebookMetadata.put(key, jsonObject.getString(key));
+                    }
                     metadata.put(ebookNumber, ebookMetadata);
                 } catch (IOException e) {
                     System.err.println("Error reading metadata for ebook " + ebookNumber + ": " + e.getMessage());

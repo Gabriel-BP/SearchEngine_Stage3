@@ -106,14 +106,14 @@ public class SearchEngineGUI extends JFrame {
                 String selectedSource = (String) dataSourceSelector.getSelectedItem();
                 try {
                     if (selectedSource.equals("CSV")) {
-                        String filePath = "/app/shared/index_content.csv";
-                        String metadataPath = "/app/shared/index_metadata.csv";
+                        String filePath = "index_content.csv";
+                        String metadataPath = "index_metadata.csv";
                         DataSource dataSource = new CSVDataSource(filePath, metadataPath);
                         invertedIndex = new InvertedIndex(dataSource);
                         JOptionPane.showMessageDialog(SearchEngineGUI.this, "Data loaded from the CSV.");
                     } else if (selectedSource.equals("Datamart")) {
-                        String datamartPath = "/app/shared/datamart_content";
-                        String metadataPath = "/app/shared/datamart_metadata";
+                        String datamartPath = "datamart_content";
+                        String metadataPath = "datamart_metadata";
                         DataSource dataSource = new DatamartDataSource(datamartPath, metadataPath);
                         invertedIndex = new InvertedIndex(dataSource);
                         JOptionPane.showMessageDialog(SearchEngineGUI.this, "Data loaded from the Datamart.");
