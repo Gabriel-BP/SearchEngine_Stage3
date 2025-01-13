@@ -46,6 +46,7 @@ public class Indexer {
                     System.err.println("Unsupported output type: " + outputType);
             }
         } catch (Exception e) {
+            csvWriter.saveContentToCSV(bookIndexer.getHashMapIndexer().getIndex());
             System.err.println("Error during indexing: " + e.getMessage());
         }
     }
