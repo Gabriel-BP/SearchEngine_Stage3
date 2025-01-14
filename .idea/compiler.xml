@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="queryengine" />
+        <module name="indexer" />
       </profile>
       <profile name="Annotation profile for indexer_csv" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -20,7 +21,6 @@
         </processorPath>
         <module name="indexer_csv" />
         <module name="crawler" />
-        <module name="indexer" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

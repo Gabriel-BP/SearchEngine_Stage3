@@ -27,15 +27,43 @@
             <artifactId>jmh-generator-annprocess</artifactId>
             <version>${jmh.version}</version>
         </dependency>
+        <dependency>
+            <groupId>pw.krejci</groupId>
+            <artifactId>jmh-maven-plugin</artifactId>
+            <version>0.2.2</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Shade plugin to package the jar -->
+            <!-- JMH plugin to generate the necessary classes for benchmarks -->
+            <plugin>
+                <groupId>pw.krejci</groupId>
+                <artifactId>jmh-maven-plugin</artifactId>
+                <version>0.2.2</version>
+
+            </plugin>
+
+            <!-- Exec plugin to run the benchmarks -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <classpath />
+                        <argument>es.ulpgc.benchmark.IndexerBenchmark</argument> <!-- Nombre de la clase de benchmark -->
+                    </arguments>
+                </configuration>
+            </plugin>
+
+            <!-- Compiler plugin to configure annotation processors -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -43,9 +71,10 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>es.ulpgc.Indexer.Main</mainClass>
+                                    <mainClass>es.ulpgc.benchmark.IndexerBenchmark</mainClass> <!-- Main class de los benchmarks -->
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -53,21 +82,6 @@
                 </executions>
             </plugin>
 
-            <!-- Compiler plugin to configure annotation processors -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.openjdk.jmh</groupId>
-                            <artifactId>jmh-generator-annprocess</artifactId>
-                            <version>${jmh.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>
