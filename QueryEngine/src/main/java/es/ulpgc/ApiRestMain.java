@@ -1,11 +1,11 @@
-package org.ulpgc;
+package es.ulpgc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
-public class RestApiApplication {
+@SpringBootApplication(scanBasePackages = "es.ulpgc")
+public class ApiRestMain {
     public static void main(String[] args) {
-        SpringApplication.run(RestApiApplication.class, args);
+        SpringApplication.run(ApiRestMain.class, args);
     }
 }

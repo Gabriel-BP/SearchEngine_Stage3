@@ -1,3 +1,4 @@
+// Clase actualizada: InvertedIndex
 package es.ulpgc.service;
 
 import java.util.*;
@@ -19,6 +20,15 @@ public class InvertedIndex {
         this.metadataProvider = new MetadataProvider(dataSource);
     }
 
+    // Devuelve el índice completo
+    public Map<String, Set<String>> getIndex() {
+        if (index == null) {
+            throw new UnsupportedOperationException("Index is not available for DatamartDataSource");
+        }
+        return index;
+    }
+
+    // Busca documentos que contienen un término
     public Set<String> search(String term) {
         if (datamartDataSource != null) {
             // Search in datamart
@@ -29,6 +39,7 @@ public class InvertedIndex {
         }
     }
 
+    // Filtra resultados basados en metadatos
     public Set<String> filterByMultipleMetadata(Set<String> results, Map<String, String> filters) {
         if (results == null || results.isEmpty()) {
             return Collections.emptySet();
@@ -49,11 +60,20 @@ public class InvertedIndex {
                 String value = filter.getValue();
 
                 // Match metadata value with filter (partial and case-insensitive)
-                if (!ebookMetadata.getOrDefault(key, "").toLowerCase().contains(value)) {
+                if (!ebookMetadata.getOrDefault(key, "").toLowerCase().contains(value.toLowerCase())) {
                     return false; // Filter does not match
                 }
             }
             return true; // All filters match
         }).collect(Collectors.toSet());
+    }
+
+    // Devuelve los metadatos de un documento específico
+    public Map<String, String> getMetadata(String docId) {
+        Map<String, String> metadata = metadataProvider.getMetadataForResults(Set.of(docId)).get(docId);
+        if (metadata == null) {
+            return Collections.emptyMap();
+        }
+        return metadata;
     }
 }
