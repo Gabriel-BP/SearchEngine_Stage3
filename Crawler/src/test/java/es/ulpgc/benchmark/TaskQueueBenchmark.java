@@ -15,23 +15,19 @@ public class TaskQueueBenchmark {
 
     @Setup
     public void setup() {
-        // Configurar e inicializar Hazelcast
         Config config = new Config();
         HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
 
-        // Obtener la instancia de Hazelcast y la cola de tareas
         taskQueue = instance.getQueue("taskQueue");
     }
 
     @Benchmark
     public void benchmarkTaskQueueAdd() {
-        // Benchmark para agregar un elemento a la cola
-        taskQueue.offer(1); // Agregar tarea con ID 1
+        taskQueue.offer(1);
     }
 
     @Benchmark
     public void benchmarkTaskQueuePoll() {
-        // Benchmark para extraer un elemento de la cola
-        taskQueue.poll(); // Extraer el siguiente elemento de la cola
+        taskQueue.poll();
     }
 }
