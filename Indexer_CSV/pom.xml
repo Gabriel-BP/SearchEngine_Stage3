@@ -32,15 +32,39 @@
             <artifactId>hazelcast</artifactId>
             <version>5.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>pw.krejci</groupId>
+            <artifactId>jmh-maven-plugin</artifactId>
+            <version>0.2.2</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <!-- Shade plugin to package the jar -->
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <classpath />
+                        <argument>es.ulpgc.benchmark.IndexerCSVBenchmark</argument> <!-- Name class benchmark -->
+                    </arguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>pw.krejci</groupId>
+                <artifactId>jmh-maven-plugin</artifactId>
+                <version>0.2.2</version>
+
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -48,15 +72,17 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>es.ulpgc.Indexer_CSV.Main</mainClass>
+                                    <mainClass>es.ulpgc.benchmark.IndexerCSVBenchmark</mainClass> <!-- Main class-->
                                 </transformer>
                             </transformers>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
 
             <!-- Compiler plugin to configure annotation processors -->
             <plugin>
