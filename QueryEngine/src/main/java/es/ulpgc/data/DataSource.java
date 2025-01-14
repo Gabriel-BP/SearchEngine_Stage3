@@ -1,4 +1,4 @@
-package es.ulpgc.service;
+package es.ulpgc.data;
 
 import java.util.Map;
 import java.util.Set;

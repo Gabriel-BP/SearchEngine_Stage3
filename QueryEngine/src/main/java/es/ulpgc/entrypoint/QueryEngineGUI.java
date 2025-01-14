@@ -1,13 +1,13 @@
-package es.ulpgc;
+package es.ulpgc.entrypoint;
 
-import es.ulpgc.client.SearchEngineGUI;
+import es.ulpgc.client.GUIHandler;
 
 import javax.swing.SwingUtilities;
 
-public class Main {
+public class QueryEngineGUI {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            SearchEngineGUI gui = new SearchEngineGUI();
+            GUIHandler gui = new GUIHandler();
             gui.setVisible(true);
         });
     }

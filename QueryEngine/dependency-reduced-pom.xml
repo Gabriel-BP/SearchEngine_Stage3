@@ -36,7 +36,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>es.ulpgc.Main</mainClass>
+                  <mainClass>es.ulpgc.entrypoint.QueryEngineGUI</mainClass>
                 </transformer>
               </transformers>
             </configuration>

@@ -1,5 +1,7 @@
 package es.ulpgc.service;
 
+import es.ulpgc.data.CSVDataSource;
+import es.ulpgc.data.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

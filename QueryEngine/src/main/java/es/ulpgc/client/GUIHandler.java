@@ -8,9 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import es.ulpgc.data.CSVDataSource;
+import es.ulpgc.data.DataSource;
+import es.ulpgc.data.DatamartDataSource;
 import es.ulpgc.service.*;
 
-public class SearchEngineGUI extends JFrame {
+public class GUIHandler extends JFrame {
     private final JComboBox<String> dataSourceSelector;
     private final JButton loadButton;
     private final JTextField queryField;
@@ -23,7 +26,7 @@ public class SearchEngineGUI extends JFrame {
     private final JTextArea resultsArea;
     private InvertedIndex invertedIndex;
 
-    public SearchEngineGUI() {
+    public GUIHandler() {
         try {
             UIManager.setLookAndFeel(new FlatIntelliJLaf());
         } catch (UnsupportedLookAndFeelException e) {
@@ -112,16 +115,16 @@ public class SearchEngineGUI extends JFrame {
                         String metadataPath = "index_metadata.csv";
                         DataSource dataSource = new CSVDataSource(filePath, metadataPath);
                         invertedIndex = new InvertedIndex(dataSource);
-                        JOptionPane.showMessageDialog(SearchEngineGUI.this, "Data loaded from the CSV.");
+                        JOptionPane.showMessageDialog(GUIHandler.this, "Data loaded from the CSV.");
                     } else if (selectedSource.equals("Datamart")) {
                         String datamartPath = "datamart_content";
                         String metadataPath = "datamart_metadata";
                         DataSource dataSource = new DatamartDataSource(datamartPath, metadataPath);
                         invertedIndex = new InvertedIndex(dataSource);
-                        JOptionPane.showMessageDialog(SearchEngineGUI.this, "Data loaded from the Datamart.");
+                        JOptionPane.showMessageDialog(GUIHandler.this, "Data loaded from the Datamart.");
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(SearchEngineGUI.this, "Error loading the data source: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(GUIHandler.this, "Error loading the data source: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -131,13 +134,13 @@ public class SearchEngineGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (invertedIndex == null) {
-                    JOptionPane.showMessageDialog(SearchEngineGUI.this, "You must first load a data source.", "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(GUIHandler.this, "You must first load a data source.", "Warning", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
                 String query = queryField.getText().trim();
                 if (query.isEmpty()) {
-                    JOptionPane.showMessageDialog(SearchEngineGUI.this, "Write a query to search.", "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(GUIHandler.this, "Write a query to search.", "Warning", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 

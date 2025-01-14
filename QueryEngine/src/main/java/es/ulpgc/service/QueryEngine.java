@@ -1,5 +1,6 @@
 package es.ulpgc.service;
 
+import es.ulpgc.data.DataSource;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -49,10 +50,10 @@ public class QueryEngine {
         return results.stream()
                 .filter(doc -> {
                     Map<String, String> metadata = invertedIndex.getMetadata(doc);
-                    if (filters.containsKey("from") && Integer.parseInt(metadata.get("year")) < Integer.parseInt(filters.get("from"))) {
+                    if (filters.containsKey("from") && Integer.parseInt(metadata.get("date")) < Integer.parseInt(filters.get("from"))) {
                         return false;
                     }
-                    if (filters.containsKey("to") && Integer.parseInt(metadata.get("year")) > Integer.parseInt(filters.get("to"))) {
+                    if (filters.containsKey("to") && Integer.parseInt(metadata.get("date")) > Integer.parseInt(filters.get("to"))) {
                         return false;
                     }
                     if (filters.containsKey("author") && !metadata.get("author").equalsIgnoreCase(filters.get("author"))) {

@@ -1,4 +1,4 @@
-package es.ulpgc;
+package es.ulpgc.entrypoint;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

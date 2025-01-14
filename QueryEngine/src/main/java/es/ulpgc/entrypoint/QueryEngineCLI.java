@@ -1,4 +1,6 @@
-package es.ulpgc.service;
+package es.ulpgc.entrypoint;
+
+import es.ulpgc.client.CLIHandler;
 
 import java.net.http.HttpClient;
 import java.util.Scanner;

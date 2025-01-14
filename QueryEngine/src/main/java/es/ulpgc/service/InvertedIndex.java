@@ -1,6 +1,9 @@
 // Clase actualizada: InvertedIndex
 package es.ulpgc.service;
 
+import es.ulpgc.data.DataSource;
+import es.ulpgc.data.DatamartDataSource;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
