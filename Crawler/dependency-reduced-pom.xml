@@ -7,23 +7,9 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer>
-                  <mainClass>es.ulpgc.Main</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
+        <groupId>pw.krejci</groupId>
+        <artifactId>jmh-maven-plugin</artifactId>
+        <version>0.2.2</version>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -38,8 +24,65 @@
           </annotationProcessorPaths>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.4.0</version>
+        <configuration>
+          <executable>java</executable>
+          <arguments>
+            <argument>-classpath</argument>
+            <classpath />
+            <argument>es.ulpgc.benchmark.jmh_generated.TaskQueueBenchmark_benchmarkTaskQueueAdd_jmhTest</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <transformers>
+                <transformer>
+                  <mainClass>es.ulpgc.benchmark.TaskQueueBenchmark</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>1.35</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>jopt-simple</artifactId>
+          <groupId>net.sf.jopt-simple</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-math3</artifactId>
+          <groupId>org.apache.commons</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>1.35</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
   <properties>
     <jmh.version>1.35</jmh.version>
     <maven.compiler.target>19</maven.compiler.target>
