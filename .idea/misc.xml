@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/Indexer/pom.xml" />
         <option value="$PROJECT_DIR$/QueryEngine/pom.xml" />
         <option value="$PROJECT_DIR$/Indexer_CSV/pom.xml" />
+        <option value="$PROJECT_DIR$/restApi/pom.xml" />
       </list>
     </option>
   </component>
