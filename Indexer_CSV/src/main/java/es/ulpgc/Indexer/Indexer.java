@@ -2,9 +2,9 @@ package es.ulpgc.Indexer;
 
 import es.ulpgc.Cleaner.Book;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class Indexer {
     private final BookIndexer bookIndexer;
@@ -18,25 +18,37 @@ public class Indexer {
 
     // Method that will use ExecutorService to parallelize indexing
     public void buildIndexes(List<Book> books) {
-        ExecutorService executor = Executors.newFixedThreadPool(4);  // Adjust the number of threads based on the system
+        // Crear un único ExecutorService
+        ExecutorService executor = Executors.newFixedThreadPool(4);  // Ajusta el número de hilos según tu sistema
 
-        // Submit indexing tasks to the thread pool
+        // Lista para almacenar las tareas que se ejecutarán en paralelo
+        List<Callable<Void>> tasks = new ArrayList<>();
+
+        // Agregar las tareas de indexación a la lista
         for (Book book : books) {
-            executor.submit(() -> {
+            tasks.add(() -> {
                 bookIndexer.indexBook(book);
+                return null;
             });
         }
 
-        // Shut down the ExecutorService after completing the tasks
-        executor.shutdown();
+        try {
+            // Ejecutar todas las tareas en paralelo usando invokeAll
+            executor.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            System.err.println("Error during parallel execution: " + e.getMessage());
+        } finally {
+            // Apagar el ExecutorService después de completar las tareas
+            executor.shutdown();
+        }
     }
 
     // Method to index the books and write the results
     public void indexBooks(List<Book> books, String outputType) {
         try {
-            buildIndexes(books);  // Index the books in parallel
+            buildIndexes(books);  // Indexar los libros en paralelo
 
-            // Write the results in the desired format (CSV or DataMart)
+            // Escribir los resultados en el formato deseado
             switch (outputType.toLowerCase()) {
                 case "csv":
                     csvWriter.saveMetadataToCSV(books);

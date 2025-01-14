@@ -23,5 +23,8 @@
         <module name="indexer" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="restApi" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
