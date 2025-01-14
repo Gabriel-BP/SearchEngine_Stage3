@@ -57,4 +57,5 @@ public class BookIndexer {
     public Trie getTrie() {
         return trie;
     }
+
 }
