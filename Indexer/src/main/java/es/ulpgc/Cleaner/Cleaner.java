@@ -38,46 +38,5 @@ public class Cleaner {
         );
     }
 
-    public List<Book> processAllBooks(String rootPath) throws IOException {
-        File rootFolder = new File(rootPath);
-        List<Book> books = new ArrayList<>();
-        LastProcessedTracker tracker = new LastProcessedTracker("LastProcessed.txt");
-        String lastProcessedBaseName = tracker.getLastProcessed();
-
-        boolean startProcessing = (lastProcessedBaseName == null); // Start immediately if no file is recorded.
-
-        if (rootFolder.exists() && rootFolder.isDirectory()) {
-            // List all subfolders in the root directory
-            File[] subfolders = rootFolder.listFiles(File::isDirectory);
-            if (subfolders != null) {
-                Arrays.sort(subfolders, Comparator.comparing(File::getName)); // Ensure folders are processed in order
-
-                for (File folder : subfolders) {
-                    File[] files = folder.listFiles((dir, name) -> name.endsWith(".txt") || name.endsWith(".html"));
-                    if (files != null) {
-                        Arrays.sort(files, Comparator.comparing(File::getName)); // Ensure files are processed in order
-
-                        for (File file : files) {
-                            String baseName = file.getName().replaceFirst("[.][^.]+$", ""); // Remove the extension
-
-                            if (!startProcessing) {
-                                // Skip files until we find the last processed base name.
-                                if (baseName.equals(lastProcessedBaseName)) {
-                                    startProcessing = true;
-                                }
-                                continue;
-                            }
-
-                            System.out.println("Processing " + file.getName() + " in folder " + folder.getName());
-                            books.add(processBook(file));
-                            tracker.updateLastProcessed(file.getName()); // Update with the full name (extension ignored internally).
-                        }
-                    }
-                }
-            }
-        }
-        return books;
-    }
-
 
 }
