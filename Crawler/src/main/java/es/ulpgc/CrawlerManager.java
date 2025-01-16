@@ -29,7 +29,7 @@ public class CrawlerManager {
             processTask(bookId);
             // wait for 5 seconds before processing the next task
             try {
-                Thread.sleep(5000);
+                Thread.sleep(2500);
             } catch (InterruptedException e) {
                 System.err.println("Error while waiting for the next task: " + e.getMessage());
             }
