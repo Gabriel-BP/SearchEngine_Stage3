@@ -17,32 +17,26 @@ public class BookIndexer {
 
     // Método para indexar los libros en paralelo
     public void indexBooks(List<Book> books) {
-        // Crear un ExecutorService con un número fijo de hilos
         ExecutorService executor = Executors.newFixedThreadPool(4);
 
-        // Lista de tareas a ejecutar en paralelo
         List<Callable<Void>> tasks = new ArrayList<>();
 
-        // Agregar las tareas de indexación para cada libro
         for (Book book : books) {
             tasks.add(() -> {
-                indexBook(book);  // Indexar el libro en paralelo
+                indexBook(book);
                 return null;
             });
         }
 
         try {
-            // Ejecutar todas las tareas en paralelo usando invokeAll
             executor.invokeAll(tasks);
         } catch (InterruptedException e) {
             System.err.println("Error during parallel execution: " + e.getMessage());
         } finally {
-            // Apagar el ExecutorService después de completar las tareas
             executor.shutdown();
         }
     }
 
-    // Método para indexar un libro individualmente
     public void indexBook(Book book) {
         for (String word : book.words) {
             hashMapIndexer.addWord(word, book.ebookNumber);

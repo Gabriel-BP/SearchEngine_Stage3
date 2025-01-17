@@ -19,12 +19,10 @@ public class Indexer {
     // Method that will use ExecutorService to parallelize indexing
     public void buildIndexes(List<Book> books) {
         // Crear un único ExecutorService
-        ExecutorService executor = Executors.newFixedThreadPool(4);  // Ajusta el número de hilos según tu sistema
+        ExecutorService executor = Executors.newFixedThreadPool(4);
 
-        // Lista para almacenar las tareas que se ejecutarán en paralelo
         List<Callable<Void>> tasks = new ArrayList<>();
 
-        // Agregar las tareas de indexación a la lista
         for (Book book : books) {
             tasks.add(() -> {
                 bookIndexer.indexBook(book);
@@ -33,7 +31,6 @@ public class Indexer {
         }
 
         try {
-            // Ejecutar todas las tareas en paralelo usando invokeAll
             executor.invokeAll(tasks);
         } catch (InterruptedException e) {
             System.err.println("Error during parallel execution: " + e.getMessage());
@@ -46,9 +43,8 @@ public class Indexer {
     // Method to index the books and write the results
     public void indexBooks(List<Book> books, String outputType) {
         try {
-            buildIndexes(books);  // Indexar los libros en paralelo
+            buildIndexes(books);
 
-            // Escribir los resultados en el formato deseado
             switch (outputType.toLowerCase()) {
                 case "csv":
                     csvWriter.saveMetadataToCSV(books);
