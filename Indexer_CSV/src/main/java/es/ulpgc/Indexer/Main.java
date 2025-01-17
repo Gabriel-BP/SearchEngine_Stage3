@@ -41,7 +41,7 @@ public class Main {
                 System.out.println("Initializing task queue...");
 
                 // Traverse all subdirectories of 'datalake' and add files to the task queue
-                File rootFolder = new File("datalake");
+                File rootFolder = new File("/app/datalake");
                 addFilesToQueue(rootFolder, taskQueue, lastProcessedFile);
 
                 System.out.println("Task queue initialized.");

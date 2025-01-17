@@ -8,8 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CSVWriter {
-    private static final String INDEX_METADATA_FILE = "index_metadata.csv";
-    private static final String INDEX_CONTENT_FILE = "index_content.csv";
+    private static final String INDEX_METADATA_FILE = "/app/csv_data/index_metadata.csv";
+    private static final String INDEX_CONTENT_FILE = "/app/csv_data/index_content.csv";
 
     public void saveMetadataToCSV(Iterable<Book> books) {
         File file = new File(INDEX_METADATA_FILE);

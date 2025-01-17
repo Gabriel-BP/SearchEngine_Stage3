@@ -10,6 +10,6 @@ public class DataSourceConfig {
 
     @Bean
     public DataSource csvDataSource() {
-        return new CSVDataSource("index_content.csv", "index_metadata.csv");
+        return new CSVDataSource("/app/csv_data/index_content.csv", "/app/csv_data/index_metadata.csv");
     }
 }

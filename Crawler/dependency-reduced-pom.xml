@@ -50,7 +50,7 @@
               <createDependencyReducedPom>true</createDependencyReducedPom>
               <transformers>
                 <transformer>
-                  <mainClass>es.ulpgc.benchmark.TaskQueueBenchmark</mainClass>
+                  <mainClass>es.ulpgc.Main</mainClass>
                 </transformer>
               </transformers>
             </configuration>

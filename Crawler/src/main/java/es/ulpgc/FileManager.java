@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class FileManager {
-    private static final String DOWNLOAD_FOLDER = "datalake";
+    private static final String DOWNLOAD_FOLDER = "app/datalake";
 
     // Returns the current date in "ddMMyyyy" format
     public static String getCurrentDate() {

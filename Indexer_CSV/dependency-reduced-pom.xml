@@ -37,7 +37,7 @@
               <createDependencyReducedPom>true</createDependencyReducedPom>
               <transformers>
                 <transformer>
-                  <mainClass>es.ulpgc.benchmark.IndexerCSVBenchmark</mainClass>
+                  <mainClass>es.ulpgc.Indexer.Main</mainClass>
                 </transformer>
               </transformers>
             </configuration>

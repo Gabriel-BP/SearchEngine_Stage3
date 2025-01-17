@@ -13,8 +13,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DataMartWriter {
-    private static final String CONTENT_DATAMART_DIR = "datamart_content";
-    private static final String METADATA_DATAMART_DIR = "datamart_metadata";
+    private static final String CONTENT_DATAMART_DIR = "/app/datamart_content";
+    private static final String METADATA_DATAMART_DIR = "/app/datamart_metadata";
 
     /**
      * Save content index to datamart_content following a trie-like directory structure.
