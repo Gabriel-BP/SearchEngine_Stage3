@@ -8,12 +8,15 @@ import java.util.stream.Collectors;
 
 @Component
 public class QueryEngine {
-    private final InvertedIndex invertedIndex;
+    private InvertedIndex invertedIndex;
 
     public QueryEngine(DataSource dataSource) {
         this.invertedIndex = new InvertedIndex(dataSource);
     }
 
+    public synchronized void reloadIndex(DataSource dataSource) {
+        this.invertedIndex = new InvertedIndex(dataSource); // Rebuild index with new data
+    }
     // Obtener estadísticas basadas en el tipo
     public Object getStats(String type) {
         switch (type) {
