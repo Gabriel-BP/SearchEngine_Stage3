@@ -28,7 +28,7 @@ public class Main {
         IMap<String, String> lastProcessedMap = hazelcastInstance.getMap("lastProcessedMap");
 
         // Define the scheduled executor service to run the task periodically
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
 
         // Task to initialize the queue and process files every 30 seconds
         Runnable task = () -> {

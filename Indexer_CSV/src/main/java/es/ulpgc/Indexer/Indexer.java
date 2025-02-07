@@ -9,46 +9,37 @@ import java.util.concurrent.*;
 public class Indexer {
     private final BookIndexer bookIndexer;
     private final CSVWriter csvWriter;
+    private final ExecutorService executor;
 
-    // Constructor
     public Indexer() {
         this.bookIndexer = new BookIndexer();
         this.csvWriter = new CSVWriter();
+        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
-    // Method that will use ExecutorService to parallelize indexing
     public void buildIndexes(List<Book> books) {
-        // Crear un único ExecutorService
-        ExecutorService executor = Executors.newFixedThreadPool(4);  // Ajusta el número de hilos según tu sistema
+        CompletionService<Void> completionService = new ExecutorCompletionService<>(executor);
 
-        // Lista para almacenar las tareas que se ejecutarán en paralelo
-        List<Callable<Void>> tasks = new ArrayList<>();
-
-        // Agregar las tareas de indexación a la lista
         for (Book book : books) {
-            tasks.add(() -> {
+            completionService.submit(() -> {
                 bookIndexer.indexBook(book);
                 return null;
             });
         }
 
         try {
-            // Ejecutar todas las tareas en paralelo usando invokeAll
-            executor.invokeAll(tasks);
-        } catch (InterruptedException e) {
-            System.err.println("Error during parallel execution: " + e.getMessage());
-        } finally {
-            // Apagar el ExecutorService después de completar las tareas
-            executor.shutdown();
+            for (int i = 0; i < books.size(); i++) {
+                completionService.take().get(); // Esperar a que todas las tareas terminen
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            System.err.println("Error en la construcción del índice: " + e.getMessage());
         }
     }
 
-    // Method to index the books and write the results
     public void indexBooks(List<Book> books, String outputType) {
         try {
-            buildIndexes(books);  // Indexar los libros en paralelo
+            buildIndexes(books);
 
-            // Escribir los resultados en el formato deseado
             switch (outputType.toLowerCase()) {
                 case "csv":
                     csvWriter.saveMetadataToCSV(books);
@@ -58,8 +49,12 @@ public class Indexer {
                     System.err.println("Unsupported output type: " + outputType);
             }
         } catch (Exception e) {
-            csvWriter.saveContentToCSV(bookIndexer.getHashMapIndexer().getIndex());
-            System.err.println("Error during indexing: " + e.getMessage());
+            System.err.println("Error durante la indexación: " + e.getMessage());
         }
+    }
+
+    public void shutdown() {
+        executor.shutdown();
+        bookIndexer.shutdown();
     }
 }

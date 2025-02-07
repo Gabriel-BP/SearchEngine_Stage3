@@ -4,142 +4,79 @@ import es.ulpgc.Cleaner.Book;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CSVWriter {
-    private static final String INDEX_METADATA_FILE = "/app/csv_data/index_metadata.csv";
-    private static final String INDEX_CONTENT_FILE = "/app/csv_data/index_content.csv";
+    private static final String INDEX_METADATA_FILE = "index_metadata.csv";
+    private static final String INDEX_CONTENT_FILE = "index_content.csv";
 
     public void saveMetadataToCSV(Iterable<Book> books) {
         File file = new File(INDEX_METADATA_FILE);
-        Set<String> existingEbookNumbers = new HashSet<>();
+        Set<String> existingEbookNumbers = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-        // Step 1: Read existing ebookNumbers if the file exists
+        // Leer números de libros existentes (si el archivo existe)
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                reader.readLine(); // Skip header
+                reader.readLine(); // Saltar la cabecera
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(",", 2); // Only need the ebookNumber
+                    String[] parts = line.split(",", 2);
                     if (parts.length > 0) {
-                        existingEbookNumbers.add(parts[0].trim().toLowerCase()); // Normalize and add to the set
+                        existingEbookNumbers.add(parts[0].trim().toLowerCase());
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Error reading existing metadata: " + e.getMessage());
+                System.err.println("Error leyendo metadatos: " + e.getMessage());
             }
         }
 
-        // Step 2: Parallelize the writing process
-        boolean isFileNew = !file.exists(); // Check if the file is new
-        ExecutorService executor = Executors.newFixedThreadPool(4);  // Adjust number of threads as needed
-
-        try (FileWriter metadataWriter = new FileWriter(file, true)) { // Open in append mode
-            if (isFileNew) {
-                metadataWriter.append("ebookNumber,Title,Author,Date,Language,Credits\n"); // Write header if file is new
-            }
-
-            // Submit tasks to executor to write new entries in parallel
+        // Escritura concurrente
+        try (BufferedWriter metadataWriter = new BufferedWriter(new FileWriter(file, true))) {
             for (Book book : books) {
-                executor.submit(() -> {
-                    String normalizedEbookNumber = book.ebookNumber.trim().toLowerCase();
-                    if (!existingEbookNumbers.contains(normalizedEbookNumber)) { // Skip duplicates
-                        synchronized (metadataWriter) { // Synchronize to ensure thread-safe writing
-                            try {
-                                existingEbookNumbers.add(normalizedEbookNumber); // Avoid duplicate writing
-                                metadataWriter.append(book.ebookNumber)
-                                        .append(",").append(book.title)
-                                        .append(",").append(book.author)
-                                        .append(",").append(book.date)
-                                        .append(",").append(book.language)
-                                        .append(",").append(book.credits)
-                                        .append("\n");
-                            } catch (IOException e) {
-                                System.err.println("Error writing metadata for ebook " + book.ebookNumber + ": " + e.getMessage());
-                            }
-                        }
+                String normalizedEbookNumber = book.ebookNumber.trim().toLowerCase();
+                if (!existingEbookNumbers.contains(normalizedEbookNumber)) {
+                    synchronized (metadataWriter) {
+                        metadataWriter.write(String.format("%s,%s,%s,%s,%s,%s%n",
+                                book.ebookNumber, book.title, book.author, book.date, book.language, book.credits));
                     }
-                });
+                    existingEbookNumbers.add(normalizedEbookNumber);
+                }
             }
-
-            // Wait for all tasks to complete
-            executor.shutdown();
-            while (!executor.isTerminated()) {
-                // Wait for all tasks to finish
-            }
-
-            System.out.println("Metadata saved to " + INDEX_METADATA_FILE);
         } catch (IOException e) {
-            System.err.println("Error writing metadata to CSV: " + e.getMessage());
+            System.err.println("Error escribiendo en CSV: " + e.getMessage());
         }
     }
 
     public void saveContentToCSV(Map<String, Set<String>> wordToEbookNumbers) {
         File file = new File(INDEX_CONTENT_FILE);
-        Map<String, Set<String>> existingData = new HashMap<>();
+        ConcurrentHashMap<String, Set<String>> existingData = new ConcurrentHashMap<>();
 
-        // Step 1: Read existing data if the file exists
+        // Leer datos existentes si el archivo existe
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                reader.readLine(); // Skip header
+                reader.readLine(); // Saltar cabecera
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] parts = line.split(",", 2);
                     if (parts.length == 2) {
-                        String word = parts[0];
-                        Set<String> ebookNumbers = new HashSet<>(Arrays.asList(parts[1].split(",")));
-                        existingData.put(word, ebookNumbers);
+                        existingData.put(parts[0], new HashSet<>(Arrays.asList(parts[1].split(","))));
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Error reading existing content index: " + e.getMessage());
+                System.err.println("Error leyendo índice: " + e.getMessage());
             }
         }
 
-        // Step 2: Merge new data into the existing map
-        for (Map.Entry<String, Set<String>> entry : wordToEbookNumbers.entrySet()) {
-            String word = entry.getKey();
-            Set<String> newEbookNumbers = entry.getValue();
-
-            // Merge with existing data
-            existingData.computeIfAbsent(word, k -> new HashSet<>()).addAll(newEbookNumbers);
-        }
-
-        // Step 3: Parallelize the writing process
-        ExecutorService executor = Executors.newFixedThreadPool(4);  // Adjust number of threads as needed
-
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.append("Word,EbookNumbers\n"); // Write header
-
-            // Submit tasks to executor to write each word's data in parallel
-            for (Map.Entry<String, Set<String>> entry : existingData.entrySet()) {
-                String word = entry.getKey();
-                Set<String> ebookNumbers = entry.getValue();
-
-                executor.submit(() -> {
-                    synchronized (writer) { // Synchronize to ensure thread-safe writing
-                        try {
-                            String ebookNumbersStr = String.join(",", ebookNumbers);
-                            writer.append(word)
-                                    .append(",").append(ebookNumbersStr)
-                                    .append("\n");
-                        } catch (IOException e) {
-                            System.err.println("Error writing content for word " + word + ": " + e.getMessage());
-                        }
-                    }
-                });
+        // Escritura concurrente
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write("Word,EbookNumbers\n");
+            for (Map.Entry<String, Set<String>> entry : wordToEbookNumbers.entrySet()) {
+                writer.write(entry.getKey() + "," + String.join(",", entry.getValue()) + "\n");
             }
-
-            // Wait for all tasks to complete
-            executor.shutdown();
-            while (!executor.isTerminated()) {
-                // Wait for all tasks to finish
-            }
-
-            System.out.println("Content index updated and saved to " + INDEX_CONTENT_FILE);
         } catch (IOException e) {
-            System.err.println("Error writing updated content index: " + e.getMessage());
+            System.err.println("Error escribiendo en CSV: " + e.getMessage());
         }
     }
 }

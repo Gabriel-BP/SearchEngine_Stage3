@@ -1,44 +1,41 @@
 package es.ulpgc.Indexer;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class HashMapIndexer {
     private final Map<String, Set<String>> hashMapIndex;
+    private final ExecutorService executor;
 
     public HashMapIndexer() {
-        this.hashMapIndex = new HashMap<>();
+        this.hashMapIndex = new ConcurrentHashMap<>();
+        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()); // Usa el número de núcleos disponibles
     }
 
-    // Method to add words in parallel
     public void addWord(String word, String ebookNumber) {
-        // Using an ExecutorService to handle additions in parallel
-        ExecutorService executor = Executors.newFixedThreadPool(4); // Number of threads is adjustable
-
-        // Calling submit to execute the task in parallel
         executor.submit(() -> {
-            synchronized (this) { // Synchronizing to protect access to the HashMap
-                hashMapIndex.computeIfAbsent(word, k -> new HashSet<>()).add(ebookNumber);
-            }
+            hashMapIndex.computeIfAbsent(word, k -> Collections.synchronizedSet(new HashSet<>())).add(ebookNumber);
         });
+    }
 
-        // Wait for all tasks to finish before continuing (optional)
+    public void shutdown() {
         executor.shutdown();
-        while (!executor.isTerminated()) {
-            // Wait until all tasks are finished
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
         }
     }
 
-    // Method to search for the word in the index
     public Set<String> search(String word) {
-        return hashMapIndex.getOrDefault(word, new HashSet<>());
+        return hashMapIndex.getOrDefault(word, Collections.emptySet());
     }
 
-    // Method to get the entire index
     public Map<String, Set<String>> getIndex() {
         return hashMapIndex;
     }
