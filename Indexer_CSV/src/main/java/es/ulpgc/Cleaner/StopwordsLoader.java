@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class StopwordsLoader {
-    private static final String STOPWORDS_RESOURCE_PATH = "stopwords-en.txt"; // Correct path to the file
+    private static final String STOPWORDS_RESOURCE_PATH = "stopwords-en.txt";
 
     public static Set<String> loadStopwords() {
         Set<String> stopwords = new HashSet<>();
